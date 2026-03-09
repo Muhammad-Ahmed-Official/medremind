@@ -56,7 +56,7 @@ const UserHeader = ({ user, router, handleLogout}:any) => {
           <View className='self-center' style={{height: hp(12), width: hp(12)}}>
             {/* <Avatar url="https://upload.wikimedia.org/wikipedia/commons/b/b3/Heilman_round.png" size={hp(5)} rounded={6.4} /> */}
             <Image source={'https://upload.wikimedia.org/wikipedia/commons/b/b3/Heilman_round.png'} style={{ borderColor: theme.colors.darkLight }} className='w-full h-full border rounded-full' />
-            <Pressable onPress={() => router.push('editProfile')} className='absolute bottom-0 -right-1 p-2 rounded-full bg-white' style={{ shadowColor: theme.colors.textLight, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 5, elevation: 7 }}>
+            <Pressable onPress={() => router.push('editProfile')} className='absolute bottom-0 -right-1 p-2 rounded-full bg-white' style={Platform.OS === 'web' ? { boxShadow: '0 4px 5px rgba(0,0,0,0.15)', elevation: 7 } : { shadowColor: theme.colors.textLight, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 5, elevation: 7 }}>
               <SimpleLineIcons name="pencil" size={16} color="black" />
             </Pressable>
           </View>

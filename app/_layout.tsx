@@ -3,25 +3,33 @@ import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import "../global.css"
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useEffect } from 'react';
+// import { useColorScheme } from '@/hooks/use-color-scheme';
+// import { useEffect } from 'react';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const router = useRouter();
-
-  useEffect(() => {
-
-  }, [])
+  // const colorScheme = useColorScheme();
+  // useEffect(() => {
+  // }, [])
+  {/* <ThemeProvider value={colorScheme === 'dark' ? DefaultTheme : DarkTheme}> */}
+  {/* </ThemeProvider> */}
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DefaultTheme : DarkTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
+    <>
+      <Stack screenOptions={{ 
+        headerShown: false, 
+        contentStyle: { backgroundColor: "white"}, 
+        animation: "slide_from_right", header: () => null, 
+        navigationBarHidden: true, 
+      }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="welcome" />
         <Stack.Screen name="(auth)" />
+        <Stack.Screen name='medications/index' options={{ headerBackTitle: "", title: "" }} />
+        <Stack.Screen name='history/index' options={{ headerBackTitle: "", title: "" }} />
+        <Stack.Screen name='calendar/index' options={{ headerBackTitle: "", title: "" }} />
+        <Stack.Screen name='refills/index' options={{ headerBackTitle: "", title: "" }} />
       </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+      <StatusBar style="light" />
+    </>
   );
 }

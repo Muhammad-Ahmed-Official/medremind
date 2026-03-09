@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable } from 'react-native'
+import { View, Text, ScrollView, Pressable, Platform } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import ScreenWrapper from '@/components/ScreenWrapper'
 import { hp, wp } from '@/helpers/common'
@@ -34,7 +34,7 @@ const editProfile = () => {
                 <View className='gap-4 mt-5'>
                     <View style={{ height: hp(14), width: hp(14) }} className='self-center'>
                         <Image source={'https://upload.wikimedia.org/wikipedia/commons/b/b3/Heilman_round.png'} style={{ borderColor: theme.colors.darkLight }} className='w-full h-full border rounded-full' />
-                        <Pressable onPress={onPickImage} style={{ shadowOpacity: 0.4, shadowColor: theme.colors.textLight, shadowOffset: { width: 0, height: 4 }, shadowRadius: 5, elevation: 7}} className='absolute bottom-0 -right-1.5 p-2 bg-white rounded-full'>
+                        <Pressable onPress={onPickImage} style={Platform.OS === 'web' ? { boxShadow: '0 4px 5px rgba(0,0,0,0.15)', elevation: 7 } : { shadowOpacity: 0.4, shadowColor: theme.colors.textLight, shadowOffset: { width: 0, height: 4 }, shadowRadius: 5, elevation: 7 }} className='absolute bottom-0 -right-1.5 p-2 bg-white rounded-full'>
                             <SimpleLineIcons name="camera" size={16} color="black" />
                         </Pressable>
                     </View>
