@@ -166,7 +166,7 @@ const home = () => {
         <View className='flex-row justify-between items-center mb-2.5'>
           <Text className='text-xl font-bold text-[#1a1a1a] mb-1.5'>Today's Schedule</Text>
 
-          <Link href={'/calendar'}>
+          <Link href={'/calendar'} asChild>
             <TouchableOpacity>
               <Text className='text-[#2e7d32] font-semibold'>See All</Text>
             </TouchableOpacity>
