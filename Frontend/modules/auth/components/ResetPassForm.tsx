@@ -8,42 +8,70 @@ import BackButton from "@/components/BackButton";
 import { hp, wp } from "@/helpers/common";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
+import { useAuth } from "../hooks/useAuth";
+import Toast from "react-native-toast-message";
 
 const ResetPassForm = () => {
-  const codeRef = useRef<string>("");
-  const passwordRef = useRef<string>("");
-  const confirmPasswordRef = useRef<string>("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const { changePassword, loading, error } = useAuth();
+  const { email } = useLocalSearchParams();
 
-  const onSubmit = async () => {
-    if (!codeRef.current || !passwordRef.current || !confirmPasswordRef.current) {
-      if (Platform.OS === "web") {
-        window.alert("Please fill all fields");
-      } else {
-        Alert.alert("Error", "Please fill all fields");
-      }
-      return;
-    }
+  const emailValue = Array.isArray(email) ? email[0] : email;
 
-    if (passwordRef.current !== confirmPasswordRef.current) {
-      Alert.alert("Error", "Passwords do not match");
-      return;
-    }
+  const [form, setForm] = useState({
+    code: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
-    setLoading(true);
-
-    // TODO: Verify code and update password API
-
-    setLoading(false);
-
-    Alert.alert("Success", "Password updated successfully");
-
-    router.replace("/(auth)/sign-in");
+  const handleChange = (field: string, value: string) => {
+    setForm(prev => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
+  const onSubmit = async () => {
+    if (!emailValue || !form.code || !form.newPassword || !form.confirmPassword) {
+      Toast.show({
+        type: "error",
+        text1: "Change Password",
+        text2: "Please fill all fields",
+      });
+      return;
+    }
+
+    if (form.newPassword !== form.confirmPassword) {
+      Toast.show({ type: "error", text1: "Password Mismatch", text2: "Passwords do not match" });
+      return;
+    }
+
+    const result: any = await changePassword({
+      email: emailValue,
+      code: form.code,
+      newPassword: form.newPassword,
+    });
+
+    if (result?.meta?.requestStatus === "fulfilled") {
+      Toast.show({ type: "success", text1: "Password Changed", text2: "Password updated successfully" });
+
+      setForm({
+        code: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+
+      router.replace("/(auth)/sign-in");
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Change Password",
+        text2: result?.payload,
+      });
+    }
+  };
   return (
     <ScreenWrapper className="bg-white">
       <StatusBar style="dark" />
@@ -71,7 +99,7 @@ const ResetPassForm = () => {
             <Input
                 icon={ <MaterialCommunityIcons name="shield-key-outline" size={22} color="black" /> }
                 placeholder="Enter verification code"
-                onChangeText={(value: string) => (codeRef.current = value)}
+                onChangeText={(value: string) => handleChange("code", value)}
             />
 
             <Input icon={ <MaterialCommunityIcons name="lock-outline" size={22} color="black" /> }
@@ -82,7 +110,7 @@ const ResetPassForm = () => {
                         <MaterialCommunityIcons name={showPassword ? "eye-off-outline" : "eye-outline"} size={22} color="#555" />
                     </Pressable>
                 }
-                onChangeText={(value: string) => (passwordRef.current = value)}
+                onChangeText={(value:string ) => handleChange("newPassword", value)}
             />
 
             <Input
@@ -94,7 +122,7 @@ const ResetPassForm = () => {
                         <MaterialCommunityIcons name={showConfirmPassword ? "eye-off-outline" : "eye-outline"} size={22} color="#555" />
                     </Pressable>
             }
-            onChangeText= { (value: string) =>(confirmPasswordRef.current = value) }
+            onChangeText= { (value: string) => handleChange('confirmPassword', value)}
             />
 
           <Button title="Update Password" loading={loading} onPress={onSubmit} />

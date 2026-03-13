@@ -8,34 +8,34 @@ import BackButton from "@/components/BackButton";
 import { hp, wp } from "@/helpers/common";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
-import { router } from "expo-router";
+import { router, useRouter } from "expo-router";
+import { useAuth } from "../hooks/useAuth";
+import Toast from "react-native-toast-message";
 
 const ForgotPassForm = () => {
-  const emailRef = useRef<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const { forgotPassword, loading, error } = useAuth();
+  const [email, setEmail] = useState("");
+  const router = useRouter();
 
-  const onSubmit = async () => {
-    if (!emailRef.current) {
-      if (Platform.OS === "web") {
-        window.alert("Please enter your email");
-      } else {
-        Alert.alert("Error", "Please enter your email");
-      }
+  const onSubmit = async() => {
+    if(!email){
+      Toast.show({ type: 'error', text1: 'Login', text2: 'Please fill all fields'});
       return;
-    }
+    };
+    
+    const result: any = await forgotPassword({ email });
 
-    setLoading(true);
-
-    // TODO: API call for reset password
-
-    setLoading(false);
-
-    if (Platform.OS === "web") {
-      window.alert("Password reset link sent to your email");
+    if (result?.meta?.requestStatus === "fulfilled") {
+      Toast.show({ type: 'success', text1: 'Forgot Password', text2: result && result.payload?.message });
+      setEmail("");
+      router.push({
+        pathname: "/(auth)/reset-pass/[email]",
+        params: { email },
+      });
     } else {
-      Alert.alert("Success", "Password reset link sent to your email");
+      Toast.show({ type: 'error', text1: 'Login', text2: result && result.payload });
     }
-  };
+  }
 
   return (
     <ScreenWrapper className="bg-white">
@@ -58,16 +58,17 @@ const ForgotPassForm = () => {
           <Input
             icon={ <MaterialCommunityIcons name="email-outline" size={24} color="black" /> }
             placeholder="Enter your email"
-            onChangeText={(value: string) => (emailRef.current = value)}
+            value={email}
+            onChangeText={setEmail}
           />
 
-          <Button title="Send Reset Link" loading={loading} onPress={onSubmit} />
+          <Button title="Send Code" loading={loading} onPress={onSubmit} />
         </View>
 
         <View className="flex-row justify-center mt-4">
           <Text className="text-gray-500">Remember your password? </Text>
 
-          <Pressable onPress={() => router.push("/reset-pass")}>
+          <Pressable onPress={() => router.push("/(auth)/sign-in")}>
             <Text style={{ color: theme.colors.primary }} className="font-semibold"> Login </Text>
           </Pressable>
         </View>

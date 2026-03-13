@@ -1,5 +1,5 @@
-import { Alert, Platform, Pressable, Text, View } from 'react-native'
-import React, { useRef, useState } from 'react'
+import { Pressable, Text, View } from 'react-native'
+import React, { useState } from 'react'
 import ScreenWrapper from '@/components/ScreenWrapper'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { theme } from '@/constants/theme'
@@ -9,21 +9,42 @@ import { hp, wp } from '@/helpers/common'
 import Input from '@/components/Input'
 import Button from '@/components/Button'
 import { router } from 'expo-router'
+import { useAuth } from '../hooks/useAuth'
+import Toast from 'react-native-toast-message'
 
 const SigninForm = () => {
-  const emailRef = useRef<string>("");
-  const passwordRef = useRef<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { login, loading, error } = useAuth();
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (field:string, value:string) => {
+    setForm(prev => ({
+      ...prev, 
+      [field]: value,
+    }));
+  };
 
   const onSubmit = async() => {
-    if(!emailRef.current || !passwordRef.current){
-      if(Platform.OS === "web"){
-        window.alert("Please fill all fields");
-      } else {
-        Alert.alert("Error", "Please fill all fields");
-      }
+    if(!form.email || !form.password){
+      Toast.show({ type: 'error', text1: 'Login', text2: 'Please fill all fields'});
       return;
+    };
+      
+    const result: any = await login(form);
+
+    if (result?.meta?.requestStatus === "fulfilled") {
+      Toast.show({ type: 'success', text1: 'Login', text2: 'Login successful' });
+      setForm({
+        email: "",
+        password: ""
+      });
+      router.push("/(main)/home");
+    } else {
+      // const message = (result && result.payload) || error || "Login failed";
+      Toast.show({ type: 'error', text1: 'Login', text2: result && result.payload });
     }
   }
 
@@ -37,14 +58,19 @@ const SigninForm = () => {
             <Text style={{ fontSize: hp(4), color: theme.colors.text }} className='font-bold'>Welcome Back</Text>
           </View>
           <View className='gap-5'>
-            <Text className='font-semibold' style={{ fontSize: hp(1.7), color: theme.colors.text }}>Please login to countinue</Text>
+            <Text className='font-semibold' style={{ fontSize: hp(1.7), color: theme.colors.text }}>Please login to continue</Text>
             <Input 
               icon={<MaterialCommunityIcons name="email-outline" size={24} color="black" />}
-              placeholder='Enter your email' onChangeText={(value:string)=> emailRef.current = value} 
+              placeholder='Enter your email'
+              type='email'
+              value={form.email}
+              onChangeText={(value:string) => handleChange("email", value)} 
               />
               <Input 
                 icon={<MaterialCommunityIcons name="lock-outline" size={24} color="black" />}
-                placeholder='Enter your password' onChangeText={(value:string)=> passwordRef.current = value} 
+                placeholder='Enter your password'
+                value={form.password}
+                onChangeText={(value:string )=> handleChange("password", value)} 
                 secureTextEntry={!showPassword}
                 rightIcon={
                   <Pressable onPress={() => setShowPassword(!showPassword)}>

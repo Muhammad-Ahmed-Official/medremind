@@ -1,12 +1,11 @@
 import { View, Text, TouchableOpacity, ScrollView, Animated, Dimensions, Platform, Modal } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons, SimpleLineIcons } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
 import Svg, { Circle } from "react-native-svg";
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { theme } from '@/constants/theme';
 
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const { width } = Dimensions.get("window");
 const QUICK_ACTIONS = [
   {
@@ -68,8 +67,8 @@ interface CircularProgressProps {
 
 function CircularProgress({ progress, totalDoses, completedDoses }: CircularProgressProps) {
   const animatedValue = useRef(new Animated.Value(0)).current;
-  const size = width * 0.55;
-  const strokeWidth = 15;
+  const size = width * 0.4
+  const strokeWidth = 10;
   const radius = Math.max(size / 2 - strokeWidth / 2, 0);
   const circumference =  2 * Math.PI * radius;
   
@@ -81,15 +80,15 @@ function CircularProgress({ progress, totalDoses, completedDoses }: CircularProg
     }).start();
   }, [progress]);
 
-  const strokeDashoffset = animatedValue.interpolate({
-    inputRange: [0, 100],
-    outputRange: [circumference, 0],
-  });
+  // const strokeDashoffset = animatedValue.interpolate({
+  //   inputRange: [0, 100],
+  //   outputRange: [circumference, 0],
+  // });
 
   return (
-    <View className='items-center justify-center my-2.5 '>
+    <View collapsable={false} className='items-center justify-center my-2.5 '>
       <View className='absolute z-[1] items-center justify-center'>
-        <Text className='text-4xl text-white font-bold'>{Math.round((completedDoses / totalDoses) * 100)}%</Text>
+        <Text className='text-4xl text-white font-bold'>{totalDoses > 0 ? Math.round((completedDoses / totalDoses) * 100): 0}%</Text>
         <Text className='text-[12px] text-white font-bold'>{completedDoses} of {totalDoses} doeses</Text>
       </View>
       <Svg width={size} height={size} className='-rotate-90' >
@@ -101,7 +100,7 @@ function CircularProgress({ progress, totalDoses, completedDoses }: CircularProg
           strokeWidth={strokeWidth}
           fill="none"
         />
-        <AnimatedCircle
+        <Circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
@@ -109,7 +108,9 @@ function CircularProgress({ progress, totalDoses, completedDoses }: CircularProg
           strokeWidth={strokeWidth}
           fill="none"
           strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
+          strokeDashoffset={
+            circumference - (progress / 100) * circumference
+          }
           strokeLinecap="round"
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
@@ -129,13 +130,16 @@ const home = () => {
             <View className='flex-1'>
               <Text className='text-lg opacity-90 font-bold text-white'>Daily Progress</Text>
             </View>
-            <TouchableOpacity onPress={() => setShowNotifications(!showNotifications)} className='relative p-2 bg-[rgba(255,255,255,0.15)] rounded-lg ml-2 '>
+            <TouchableOpacity onPress={() => setShowNotifications(!showNotifications)} className='relative p-2 bg-[rgba(255,255,255,0.15)] rounded-lg ml-2'>
               <Ionicons name='notifications-outline' size={24} color='white' />
               {/* {todaysMedications.length > 0 && ( */}
                 <View className='absolute -top-1 -right-1 bg-[#ff5252] rounded-lg h-5 px-1 justify-center items-center min-w-5'>
                   <Text className='text-[12px] text-white font-bold'>4</Text>
                 </View>
               {/* )} */}
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/")} className='p-2 bg-[rgba(255,255,255,0.15)] rounded-lg ml-3'>
+              <SimpleLineIcons name="logout" size={22} color="white" />
             </TouchableOpacity>
           </View>
           <CircularProgress progress={(5 / 10) * 100}  totalDoses={10} completedDoses={5} />

@@ -6,11 +6,11 @@ import { hp } from '@/helpers/common'
 const Input = (props:any) => {
   return (
     <View className='flex-row items-center justify-center rounded-xl gap-3 px-4' style={[props.containerStyles && props.containerStyles, 
-    { height: hp(7.2), borderWidth: 0.4, borderColor: theme.colors.darkLight, borderCurve: 'continuous'}]}>
+    { height: hp(7.2), borderWidth: 0.4, borderColor: theme.colors.textLight, borderCurve: 'continuous'}]}>
         { 
             props.icon && props.icon
         }
-        <TextInput className='flex-1 outline-none' placeholderTextColor={theme.colors.textLight} ref={props.inputRef && props.inputRef} {...props} />
+        <TextInput type={props.type || 'text'} value={props.value} className='flex-1 outline-none' placeholderTextColor={theme.colors.textLight} ref={props.inputRef && props.inputRef} {...props} />
         { props.rightIcon && <View className="ml-2">{props.rightIcon}</View> }
     </View>
   )

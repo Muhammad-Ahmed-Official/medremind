@@ -1,11 +1,10 @@
-import { View, Text, TouchableOpacity, ScrollView, TextInput, Dimensions, Switch } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, TextInput, Switch, Platform } from 'react-native'
 import React, { useState } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router';
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-const { width } = Dimensions.get("window");
 
 const FREQUENCIES = [
   {
@@ -65,6 +64,9 @@ const AddMedication = () => {
   const [selectedFrequency, setSelectedFrequency] = useState("");
   const [selectedDuration, setSelectedDuration] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  console.log(form)
+
   const renderFrequencyOptions = () => {
     return (
       <View className="flex-row flex-wrap -mx-1.5">
@@ -148,7 +150,7 @@ const AddMedication = () => {
   };
 
 return (
-  <View className="flex-1 bg-gray-100">
+  <View className="flex-1 bg-[#f8f9fa]">
     <LinearGradient
       colors={["#1a8e2d", "#146922"]}
       start={{ x: 0, y: 0 }}
@@ -211,13 +213,70 @@ return (
           {renderDurationOptions()}
 
           {/* Date picker */}
-          <TouchableOpacity className="flex-row items-center bg-white p-4 rounded-xl mt-4 border border-gray-200 shadow-md">
+          <TouchableOpacity onPress={() => setShowDatePicker(true)} className="flex-row items-center bg-white p-4 rounded-xl mt-4 border border-gray-200 shadow-md">
             <View className="w-10 h-10 bg-gray-100 rounded-full justify-center items-center mr-3">
               <Ionicons name="calendar" size={20} color="#1a8e2d" />
             </View>
             <Text className="flex-1 text-gray-800">Starts: {form.startDate.toLocaleDateString()}</Text>
             <Ionicons name="chevron-forward" size={20} color="#666" />
           </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={form.startDate}
+                mode="date"
+                onChange={(event, date) => {
+                  setShowDatePicker(false);
+                  if (date) setForm({ ...form, startDate: date });
+                }}
+              />
+            )}
+            {form.frequency && form.frequency !== "As needed" && (
+              <View className='mt-5'>
+                <Text className='text-[16px] font-semibold text-[#333] mb-2.5'>Medication Times</Text>
+                {form.times.map((time, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    className='flex-row items-center bg-white p-4 rounded-xl mt-4 border border-gray-200 shadow-md'
+                    style={Platform.OS === 'web' ? { boxShadow: '0 2px 8px rgba(0,0,0,0.15)' } : { shadowOpacity: 0.05, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowRadius: 8, elevation: 2 }} 
+                    onPress={() => {
+                      setShowTimePicker(true);
+                    }}
+                  >
+                    <View className='w-10 h-10 rounded-2xl bg-[#f5f5f5] items-center justify-center mr-2.5'>
+                      <Ionicons name="time-outline" size={20} color="#1a8e2d" />
+                    </View>
+                    <Text className='flex-1 text-[16px] text-[#333]'>{time}</Text>
+                    <Ionicons name="chevron-forward" size={20} color="#666" />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+            {showTimePicker && (
+              <DateTimePicker
+                value={(() => {
+                  const [hours, minutes] = form.times[0].split(":").map(Number);
+                  const date = new Date();
+                  date.setHours(hours, minutes, 0, 0);
+                  return date;
+                })()}
+                mode="time"
+                onChange={(event, date) => {
+                  setShowTimePicker(false);
+                  if (date) {
+                    const newTime = date.toLocaleTimeString("default", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: false,
+                    });
+                    setForm((prev) => ({
+                      ...prev,
+                      times: prev.times.map((t, i) => (i === 0 ? newTime : t)),
+                    }));
+                  }
+                }}
+              />
+            )}
+
         </View>
 
         {/* Reminder */}
@@ -266,6 +325,33 @@ return (
           </View>
         </View>
       </ScrollView>
+
+       <View className='p-5 bg-white border-t border-t-[#e0e0e0]'>
+          <TouchableOpacity
+            className={`rounded-2xl overflow-hidden mb-3 ${isSubmitting && 'opacity-70'}`}
+            // onPress={handleSave}
+            disabled={isSubmitting}
+          >
+            <LinearGradient
+              colors={["#1a8e2d", "#146922"]}
+              className='py-3.5 justify-center items-center'
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            >
+              <Text className='text-white text-[16px] font-bold'>
+                {isSubmitting ? "Adding..." : "Add Medication"}
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className='py-3.5 rounded-2xl border border-[#e0e0e0] justify-center items-center bg-white'
+            onPress={() => router.back()}
+            disabled={isSubmitting}
+          >
+            <Text className='text-[#666] text-[16px] font-semibold'>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+
     </View>
   </View>
 );

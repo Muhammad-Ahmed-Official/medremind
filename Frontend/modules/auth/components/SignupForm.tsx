@@ -1,5 +1,5 @@
-import { Alert, Platform, Pressable, Text, View } from 'react-native'
-import React, { useRef, useState } from 'react'
+import { Pressable, Text, View } from 'react-native'
+import { useState } from 'react'
 import ScreenWrapper from '@/components/ScreenWrapper'
 import { MaterialCommunityIcons, SimpleLineIcons } from '@expo/vector-icons'
 import { theme } from '@/constants/theme'
@@ -8,28 +8,48 @@ import BackButton from '@/components/BackButton'
 import { hp, wp } from '@/helpers/common'
 import Input from '@/components/Input'
 import Button from '@/components/Button'
-import { router } from 'expo-router'
+import { useRouter } from 'expo-router'
+import { useAuth } from '../hooks/useAuth'
+import Toast from 'react-native-toast-message'
 
 const SignupForm = () => {
-  const nameRef = useRef<string>("");
-  const emailRef = useRef<string>("");
-  const passwordRef = useRef<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const { signup, loading, error } = useAuth();
+  const [form, setForm] = useState({
+    userName: "",
+    email: "",
+    password: "",
+  });
+
+
+  const handleChange = (field:string, value:string) => {
+    setForm(prev => ({
+      ...prev, 
+      [field]: value,
+    }));
+  };
 
   const onSubmit = async() => {
-    if(!nameRef || !emailRef.current || !passwordRef.current){
-      if(Platform.OS === "web"){
-        window.alert("Please fill all fields");
-      } else {
-        Alert.alert("Signup", "Please fill all fields");
-      }
+    if(!form.userName || !form.email || !form.password){
+      Toast.show({ type: 'error', text1: 'Signup', text2: 'Please fill all fields'});
       return;
-    }
-    let name = nameRef.current.trim();
-    let email = emailRef.current.trim();
-    let passwoes = passwordRef.current.trim();
+    };
+    
+    const result: any = await signup(form);
 
+    if (result?.meta?.requestStatus === "fulfilled") {
+      Toast.show({ type: 'success', text1: 'Signup', text2: 'Signup successful' });
+      setForm({
+        userName: "",
+        email: "",
+        password: ""
+      });
+      router.push("/(auth)/sign-in");
+    } else {
+      // const message = (result && result.payload) || error || "Signup failed";
+      Toast.show({ type: 'error', text1: 'Signup', text2:  result && result.payload });
+    }
   }
 
   return (
@@ -45,15 +65,21 @@ const SignupForm = () => {
             <Text className='font-semibold' style={{ fontSize: hp(1.7), color: theme.colors.text }}>Please fill the details to create an account</Text>
             <Input 
               icon={<SimpleLineIcons name="user" size={24} color="black" />}
-              placeholder='Enter your name' onChangeText={(value:string)=> nameRef.current = value} 
+              placeholder='Enter your name'
+              value={form.userName}
+              onChangeText={(value:string) => handleChange("userName", value)} 
             />
             <Input 
               icon={<MaterialCommunityIcons name="email-outline" size={24} color="black" />}
-              placeholder='Enter your email' onChangeText={(value:string)=> emailRef.current = value} 
+              placeholder='Enter your email'
+              value={form.email}
+              onChangeText={(value:string) => handleChange("email", value)} 
               />
             <Input 
               icon={<MaterialCommunityIcons name="lock-outline" size={24} color="black" />}
-              placeholder='Enter your password' onChangeText={(value:string)=> passwordRef.current = value} 
+              placeholder='Enter your password'
+              value={form.password}
+              onChangeText={(value:string) => handleChange("password", value)} 
               secureTextEntry={!showPassword}
               rightIcon={
                 <Pressable onPress={() => setShowPassword(!showPassword)}>
