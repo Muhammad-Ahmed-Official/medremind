@@ -2,27 +2,22 @@ import React, { useEffect } from 'react'
 import { Stack, useRouter } from 'expo-router'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store/store'
-import "../../global.css"
 
-const AuthLayout = () => {
+const MainLayout = () => {
   const router = useRouter()
   const { user, isHydrated } = useSelector((state: RootState) => state.auth)
 
   useEffect(() => {
-    if (isHydrated && user) {
-      router.replace('/(main)/home')
+    if (isHydrated && !user) {
+      router.replace('/welcome')
     }
   }, [user, isHydrated])
 
-  if (!isHydrated) return null
-  if (user) return null
+  if (!isHydrated || !user) return null
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name='sign-in' />
-      <Stack.Screen name='sign-up' />
-    </Stack>
+    <Stack screenOptions={{ headerShown: false }} />
   )
 }
 
-export default AuthLayout
+export default MainLayout

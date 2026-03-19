@@ -4,6 +4,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store/store';
+import { restoreAuthFromStorage } from '@/store/authSlice';
 
 const { width, height } = Dimensions.get('window');
 
@@ -14,6 +17,7 @@ const index = () => {
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const slideUp = useRef(new Animated.Value(50)).current;
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     // Icon rotation animation
@@ -59,11 +63,18 @@ const index = () => {
       ])
     ).start();
 
-    const timer = setTimeout(() => {
-      router.replace("/welcome"); 
-    }, 3500);
+    const minDisplay = new Promise<void>(resolve => setTimeout(resolve, 3500));
+    const sessionRestore = dispatch(restoreAuthFromStorage());
 
-    return () => clearTimeout(timer);
+    Promise.all([minDisplay, sessionRestore]).then(([, result]: any) => {
+      if (result?.payload) {
+        router.replace("/(main)/home");
+      } else {
+        router.replace("/welcome");
+      }
+    });
+
+    return () => sessionRestore.abort();
   }, []);
 
   const spin = iconRotate.interpolate({

@@ -20,7 +20,7 @@ const Welcome = () => {
             </View>
 
             <View className='gap-5 w-full'>
-                <Button title='Getting Started' buttonStyle={{ marginHorizontal: wp(3)}} onPress={() => {router.push("/home")}}  />
+                <Button title='Getting Started' buttonStyle={{ marginHorizontal: wp(3)}} onPress={() => {router.push("/(auth)/sign-up")}}  />
                 <View className='flex-row justify-center items-center gap-1'>
                     <Text className='text-center' style={{ color: theme.colors.text, fontSize: hp(1.9)}}> Already have an account! </Text>
                     <Pressable onPress={() => {router.push("/(auth)/sign-in")}}>

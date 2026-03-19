@@ -7,6 +7,7 @@ import { Link, router } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useMedicine } from '@/modules/auth/hooks/useMedicine';
 import Toast from 'react-native-toast-message';
+import { useAuth } from '@/modules/auth/hooks/useAuth';
 
 const { width } = Dimensions.get("window");
 const QUICK_ACTIONS = [
@@ -162,6 +163,12 @@ const home = () => {
   const [showNotifications, setShowNotifications] = useState<boolean>(false);
   const [todayMedicines, setTodayMedicines] = useState<any[]>([]);
   const { getTodaysMedicine, TodaysMedicineTaken,  deleteMedicine, loading, error } = useMedicine();
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/welcome');
+  };
 
   const totalDoses = todayMedicines.reduce( (total, med) => total + med?.times?.length, 0 );
   const completedDoses = todayMedicines.reduce( (total, med) => total + med?.times?.filter((t:any) => t.taken)?.length, 0 );
@@ -229,7 +236,7 @@ const home = () => {
                 </View>
               {/* )} */}
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push("/")} className='p-2 bg-[rgba(255,255,255,0.15)] rounded-lg ml-3'>
+            <TouchableOpacity onPress={() => handleLogout()} className='p-2 bg-[rgba(255,255,255,0.15)] rounded-lg ml-3'>
               <SimpleLineIcons name="logout" size={22} color="white" />
             </TouchableOpacity>
           </View>

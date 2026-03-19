@@ -1,16 +1,21 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as authService from "../modules/auth/services/authServices";
+
+const AUTH_STORAGE_KEY = "@midremind/auth_user";
 
 interface AuthState {
   user: any;
   loading: boolean;
   error: string | null;
+  isHydrated: boolean;
 }
 
 const initialState: AuthState = {
   user: null,
   loading: false,
   error: null,
+  isHydrated: false,
 };
 
 export const signupUser = createAsyncThunk("/auth/signup",
@@ -58,10 +63,38 @@ export const chnagePasswordUser = createAsyncThunk("/auth/chnage-password",
   }
 );
 
+export const restoreAuthFromStorage = createAsyncThunk("auth/restoreFromStorage",
+  async (_, thunkAPI) => {
+    try {
+      const raw = await AsyncStorage.getItem(AUTH_STORAGE_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error?.message);
+    }
+  }
+);
+
+export const logoutUser = createAsyncThunk("auth/logout",
+  async (_, thunkAPI) => {
+    try {
+      await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error?.message);
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    clearAuth: (state) => {
+      state.user = null;
+      state.error = null;
+      state.isHydrated = true;
+    },
+  },
 
   extraReducers: builder => {
     builder
@@ -116,7 +149,31 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
+
+      .addCase(restoreAuthFromStorage.pending, state => {
+        state.loading = true;
+        state.isHydrated = false;
+      })
+      .addCase(restoreAuthFromStorage.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.isHydrated = true;
+      })
+      .addCase(restoreAuthFromStorage.rejected, state => {
+        state.loading = false;
+        state.isHydrated = true;
+      })
+
+      .addCase(logoutUser.fulfilled, state => {
+        state.user = null;
+        state.isHydrated = true;
+      })
+      .addCase(logoutUser.rejected, state => {
+        state.user = null;
+        state.isHydrated = true;
+      })
   },
 });
 
+export const { clearAuth } = authSlice.actions;
 export default authSlice.reducer;

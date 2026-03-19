@@ -41,7 +41,7 @@ const SigninForm = () => {
         email: "",
         password: ""
       });
-      router.push("/(main)/home");
+      router.replace("/(main)/home");
     } else {
       // const message = (result && result.payload) || error || "Login failed";
       Toast.show({ type: 'error', text1: 'Login', text2: result && result.payload });

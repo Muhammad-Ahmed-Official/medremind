@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { signupUser, loginUser, forgotPasswordUser, chnagePasswordUser } from "@/store/authSlice";
+import { signupUser, loginUser, forgotPasswordUser, chnagePasswordUser, restoreAuthFromStorage, logoutUser } from "@/store/authSlice";
 import { RootState, AppDispatch } from "@/store/store";
 
 export const useAuth = () => {
@@ -18,12 +18,19 @@ export const useAuth = () => {
   const changePassword = (data: { email: string; newPassword: string, code:string }) =>
     dispatch(chnagePasswordUser(data));
 
+  const restoreSession = () =>
+    dispatch(restoreAuthFromStorage());
+
+  const logout = () =>
+    dispatch(logoutUser());
 
   return {
     ...auth,
     signup,
     login,
     forgotPassword,
-    changePassword
+    changePassword,
+    restoreSession,
+    logout,
   };
 };
