@@ -195,6 +195,10 @@ const AddMedication = () => {
 
 
   const onSubmit = async() => {
+    if(form.refillAt > form.currentSupply) {
+      Toast.show({ type: "error", text1: 'Invalid Calculation', text2: 'Refilling cannot greater then Remaning Pills'})
+      return;
+    }
     const result: any = await createMedicine(form);
     if (result?.meta?.requestStatus === "fulfilled") {
       Toast.show({ type: 'success', text1: 'Medication', text2: 'Added successfully' });
@@ -395,7 +399,7 @@ return (
         </View>
 
         {/* Refill Tracking */}
-        <View className='mb-6'>
+       { form.duration && form.duration === "Ongoing" ? <View className='mb-6'>
           <View className="mb-6 bg-white rounded-xl p-5 border border-gray-200 shadow-md">
             <View className="flex-row justify-between items-center">
               <View className="flex-row items-center flex-1">
@@ -450,7 +454,7 @@ return (
                 </View>
               )}
           </View>
-        </View>
+        </View> : <View></View>}
 
         {/* Notes */}
           <View className='mb-6'>

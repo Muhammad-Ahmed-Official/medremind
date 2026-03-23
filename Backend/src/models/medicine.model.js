@@ -45,6 +45,11 @@ const medicineSchema = new mongoose.Schema({
       default: false,
     },
 
+    totalSupply: {
+      type: Number,
+      required: true
+    },
+
     currentSupply: {
       type: Number,
       default: 0,
@@ -55,6 +60,10 @@ const medicineSchema = new mongoose.Schema({
       default: 0,
     },
 
+    lastRefillAt: {
+      type: Date,
+      default: Date.now,
+    }
 }, { timestamps: true } );
 
 export const Medicine = mongoose.model("Medicine", medicineSchema);

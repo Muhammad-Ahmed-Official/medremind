@@ -42,6 +42,17 @@ export const getHistory = async () => {
 };
 
 
+export const getRefill = async () => {
+  try {
+    const response = await api.get("medicine/refillMedicine");
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Get Medicine history data failed");
+  }
+};
+
+
+
 export const TodaysMedicineTaken = async (data: { logId: string, time: string }) => {
   try {
     const response = await api.patch("medicine/markTaken", data);

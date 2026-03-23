@@ -1,4 +1,4 @@
-import { createMedicineUser, deleteMedicineUser, TodaysMedicineTakenUser, getTodaysMedicineUser, getMedicineHistoryUser } from "@/store/medicineSlice";
+import { createMedicineUser, deleteMedicineUser, TodaysMedicineTakenUser, getTodaysMedicineUser, getMedicineHistoryUser, getRefillMedicineUser } from "@/store/medicineSlice";
 import { AppDispatch, RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux"
 
@@ -15,6 +15,9 @@ export const useMedicine = () => {
     const getMedicineHistory = () => 
         dispatch(getMedicineHistoryUser())
 
+    const getRefillMedicine = () => 
+        dispatch(getRefillMedicineUser())
+
     const TodaysMedicineTaken = (data: { logId: string, time: string }) => 
         dispatch(TodaysMedicineTakenUser(data));
 
@@ -25,7 +28,8 @@ export const useMedicine = () => {
         ...medicine,
         createMedicine,
         getTodaysMedicine,
-        getMedicineHistory, 
+        getMedicineHistory,
+        getRefillMedicine, 
         TodaysMedicineTaken,
         deleteMedicine,
     };

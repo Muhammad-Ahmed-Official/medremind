@@ -3,7 +3,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { Medicine } from "../models/medicine.model.js";
 import { MedicineLog } from "../models/medicinelog.model.js";
 
-
 export const addMedicine = asyncHandler(async (req, res) => {
   const { name, dosage, frequency, duration, startDate, times, notes, reminderEnabled, refillReminder, currentSupply, refillAt } = req.body;
 
@@ -28,12 +27,18 @@ export const addMedicine = asyncHandler(async (req, res) => {
     reminderEnabled,
     refillReminder,
     currentSupply,
-    refillAt
+    refillAt,
+    totalSupply: currentSupply
   });
 
   // 2️⃣ Prepare doses for the entire duration
   const start = new Date(startDate); // user's startDate
-  const totalDays = parseInt(duration, 10);
+  let totalDays;
+  if (duration === "Ongoing") {
+    totalDays = 30; 
+  } else {
+    totalDays = parseInt(duration, 10);
+  }
 
   const dosesArray = [];
   for (let i = 0; i < totalDays; i++) {
@@ -64,19 +69,40 @@ export const addMedicine = asyncHandler(async (req, res) => {
   });
 });
 
-
 const isActiveToday = (startDate, duration) => {
   const start = new Date(startDate);
-  start.setHours(0,0,0,0);
-
-  const end = new Date(start);
-  end.setDate(start.getDate() + parseInt(duration) - 1);
+  start.setHours(0, 0, 0, 0);
 
   const today = new Date();
-  today.setHours(0,0,0,0);
+  today.setHours(0, 0, 0, 0);
+
+  // ✅ Ongoing medicines are always active after start date
+  if (duration === "Ongoing" || duration === "onGoing") {
+    return today >= start;
+  }
+
+  // ✅ Fixed duration medicines
+  const totalDays = parseInt(duration, 10);
+  if (isNaN(totalDays)) return false;
+
+  const end = new Date(start);
+  end.setDate(start.getDate() + totalDays - 1);
 
   return today >= start && today <= end;
 };
+
+// const isActiveToday = (startDate, duration) => {
+//   const start = new Date(startDate);
+//   start.setHours(0,0,0,0);
+
+//   const end = new Date(start);
+//   end.setDate(start.getDate() + parseInt(duration) - 1);
+
+//   const today = new Date();
+//   today.setHours(0,0,0,0);
+
+//   return today >= start && today <= end;
+// };
 
 const timeStringToMinutes = (timeStr) => {
   const [time, modifier] = timeStr.split(" "); // "10:00", "AM"
@@ -85,6 +111,8 @@ const timeStringToMinutes = (timeStr) => {
   if (modifier === "AM" && hours === 12) hours = 0;
   return hours * 60 + minutes;
 };
+
+
 
 export const getTodayMedicines = asyncHandler(async (req, res) => {
   const userId = "69b1399ed542722a3eafbe8d";
@@ -100,6 +128,7 @@ export const getTodayMedicines = asyncHandler(async (req, res) => {
   for (const med of meds) {
     // Skip if medicine is not active today
     if (!isActiveToday(med.startDate, med.duration)) continue;
+
 
     // Fetch the single medicine log
     const medLog = await MedicineLog.findOne({ medicineId: med._id }).lean();
@@ -139,6 +168,8 @@ export const getTodayMedicines = asyncHandler(async (req, res) => {
     data: result
   });
 });
+
+
 
 export const getHistory = asyncHandler(async (req, res) => {
   const userId = "69b1399ed542722a3eafbe8d";
@@ -210,14 +241,27 @@ export const markDoseTaken = asyncHandler(async (req, res) => {
     });
   }
 
-  // ✅ Today's date at 00:00
+  // ✅ Today's range
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
 
-  // ✅ Update ONLY today's dose AND specific time
+  // ✅ Find the log first (needed for medicineId)
+  const medLog = await MedicineLog.findById(logId);
+
+  if (!medLog) {
+    return res.status(404).send({
+      status: false,
+      message: "Log not found",
+    });
+  }
+
+  // ===============================
+  // 1️⃣ Mark dose as taken
+  // ===============================
+
   const result = await MedicineLog.updateOne(
     {
       _id: logId,
@@ -244,12 +288,27 @@ export const markDoseTaken = asyncHandler(async (req, res) => {
     });
   }
 
+  // ===============================
+  // 2️⃣ Decrement supply
+  // ===============================
+
+  const medicine = await Medicine.findById(medLog.medicineId);
+
+  if (medicine && medicine.currentSupply > 0) {
+    medicine.currentSupply -= 1;
+    await medicine.save();
+  }
+
+  // ===============================
+  // 3️⃣ Response
+  // ===============================
+
   res.status(200).send({
     status: true,
     message: "Medicine taken successfully",
+    currentSupply: medicine?.currentSupply,
   });
 });
-
 
 
 export const deleteMedicine = asyncHandler(async(req, res) => {
@@ -266,4 +325,28 @@ export const deleteMedicine = asyncHandler(async(req, res) => {
    
   await MedicineLog.deleteMany({ medicineId: _id });
   res.status(StatusCodes.OK).send({ status: StatusCodes.OK, message: "Medicine and related logs deleted successfully" });
+});
+
+
+
+export const getRefillMedicine = asyncHandler(async (req, res) => {
+  const userId = "69b1399ed542722a3eafbe8d";
+
+  const meds = await Medicine.find({ userId, refillReminder: true });
+
+  if (!meds || meds.length === 0) {
+    return res.status(StatusCodes.NOT_FOUND).send({ status: StatusCodes.NOT_FOUND, message: "No refill medicines found" });
+  };
+
+  const result = meds.map(med => ({
+    medicineId: med._id,
+    name: med.name,
+    dosage: med.dosage,
+    currentSupply: med.currentSupply,
+    totalSupply: med.totalSupply, 
+    refillAt: med.refillAt,
+    lastRefillDate: med.lastRefillAt
+  }));
+
+  res.status(StatusCodes.OK).send({ status: StatusCodes.OK, data: result });
 });

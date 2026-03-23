@@ -50,6 +50,18 @@ export const getMedicineHistoryUser = createAsyncThunk("/medicine/history",
 );
 
 
+export const getRefillMedicineUser = createAsyncThunk("/medicine/refill",
+  async (_, thunkAPI) => {
+    try {
+      return await medicineServices.getRefill();
+    } catch (error: any) {
+      const message = error?.message
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+
 export const TodaysMedicineTakenUser = createAsyncThunk("/medicine/taken",
   async (data: { logId: string, time: string }, thunkAPI) => {
     try {
@@ -102,6 +114,19 @@ const medicineSlice = createSlice({
             state.user = action.payload;
         })
         .addCase(getTodaysMedicineUser.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload as string;
+        })
+
+        .addCase(getRefillMedicineUser.pending, state => {
+            state.loading = true;
+            state.error = null;
+        })
+        .addCase(getRefillMedicineUser.fulfilled, (state, action) => {
+            state.loading = false;
+            state.user = action.payload;
+        })
+        .addCase(getRefillMedicineUser.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload as string;
         })
