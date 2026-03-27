@@ -6,23 +6,24 @@ import medicineRouter from "./routes/medicine.routes.js";
 const app = express();
 
 // Middleware Configurations – allow frontend (Expo web) origins
-const allowedOrigins = [
-  "http://localhost:19006",
-  "http://127.0.0.1:8081",
-  "http://127.0.0.1:19006",
-  "exp://192.168.0.105:8081",
-  ...(process.env.ALLOWED_ORIGIN ? [process.env.ALLOWED_ORIGIN.replace(/^"|"$/g, "")] : []),
-];
-app.use(cors({
-  origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
-    if (origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:")) return cb(null, true);
-    cb(null, false);
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
+// const allowedOrigins = [
+//   "http://localhost:19006",
+//   "http://127.0.0.1:8081",
+//   "http://127.0.0.1:19006",
+//   "exp://192.168.0.105:8081",
+//   ...(process.env.ALLOWED_ORIGIN ? [process.env.ALLOWED_ORIGIN.replace(/^"|"$/g, "")] : []),
+// ];
+// app.use(cors({
+//   origin: (origin, cb) => {
+//     if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+//     if (origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:")) return cb(null, true);
+//     cb(null, false);
+//   },
+//   credentials: true,
+//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+//   allowedHeaders: ["Content-Type", "Authorization"],
+// }));
+app.use(cors()); 
 app.use(express.json());
 app.use(cookieParser());
 
