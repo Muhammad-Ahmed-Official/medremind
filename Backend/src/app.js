@@ -3,8 +3,22 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.routes.js";
 import medicineRouter from "./routes/medicine.routes.js";
-import { isDbConnected } from "./db/index.js";
 const app = express();
+
+app.use(cors()); 
+app.use(express.json());
+// app.use(cookieParser());
+
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
+
+
+// Routes
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/medicine", medicineRouter);
+
+export default app;
 
 // Middleware Configurations – allow frontend (Expo web) origins
 // const allowedOrigins = [
@@ -24,40 +38,6 @@ const app = express();
 //   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
 //   allowedHeaders: ["Content-Type", "Authorization"],
 // }));
-app.use(cors()); 
-app.use(express.json());
-app.use(cookieParser());
-
-
-app.get("/", (req, res) => {
-  res.send("Hello World");
-});
-
-app.use("/api/v1", async (req, res, next) => {
-  if (isDbConnected()) return next();
-  try {
-    await ensureConnection();
-  } catch (err) {
-    console.error("[DB] ensureConnection failed:", err.message);
-    return res.status(503).json({
-      status: false,
-      message: "Database is not ready. Please try again in a moment.",
-    });
-  }
-  if (!isDbConnected()) {
-    return res.status(503).json({
-      status: false,
-      message: "Database is not ready. Please try again in a moment.",
-    });
-  }
-  next();
-});
-
-// Routes
-app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/medicine", medicineRouter);
-
-export default app;
 
 // app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 // app.use(express.static("public"));
