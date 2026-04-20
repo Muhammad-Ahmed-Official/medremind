@@ -7,6 +7,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useMedicine } from '@/modules/auth/hooks/useMedicine';
 import Toast from 'react-native-toast-message';
 import Button from '@/components/Button';
+import { scheduleMedicineNotifications } from '@/services/notificationService';
 
 const FREQUENCIES = [
   {
@@ -201,6 +202,9 @@ const AddMedication = () => {
     }
     const result: any = await createMedicine(form);
     if (result?.meta?.requestStatus === "fulfilled") {
+      if (form.reminderEnabled && result.payload?.data?._id) {
+        await scheduleMedicineNotifications(result.payload.data._id, form.name, form.times);
+      }
       Toast.show({ type: 'success', text1: 'Medication', text2: 'Added successfully' });
       setForm({
         name: "",

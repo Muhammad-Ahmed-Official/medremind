@@ -63,7 +63,8 @@ export const addMedicine = asyncHandler(async (req, res) => {
 
   res.status(StatusCodes.CREATED).send({
     status: true,
-    message: "Medicine created successfully with all doses in a single log"
+    message: "Medicine created successfully with all doses in a single log",
+    data: { _id: medicine._id }
   });
 });
 

@@ -8,6 +8,7 @@ import { theme } from '@/constants/theme';
 import { useMedicine } from '@/modules/auth/hooks/useMedicine';
 import Toast from 'react-native-toast-message';
 import { useAuth } from '@/modules/auth/hooks/useAuth';
+import { cancelMedicineTimeNotification, cancelAllMedicineNotifications } from '@/services/notificationService';
 
 const { width } = Dimensions.get("window");
 const QUICK_ACTIONS = [
@@ -192,9 +193,11 @@ const home = () => {
 
 
   const handleTakeDose = async(data:any) => {
-    console.log({ logId: data?.logId, time: data.time })
     const result: any = await TodaysMedicineTaken({ logId: data?.logId, time: data?.time });
     if (result?.meta?.requestStatus === "fulfilled") {
+      if (data?.medicineId) {
+        await cancelMedicineTimeNotification(data.medicineId, data.time);
+      }
       setTodayMedicines(prev =>
         prev.map(med =>
           med.logId === data?.logId
@@ -211,6 +214,7 @@ const home = () => {
 
   const handleDeleteMedicine = async(_id: any) => {
     setTodayMedicines(prev =>  prev.filter(med => med?.medicineId !== _id) )
+    await cancelAllMedicineNotifications(_id);
     const result: any = await deleteMedicine(_id);
     if (result?.meta?.requestStatus === "fulfilled") {
     } else {
@@ -392,7 +396,7 @@ todayMedicines.map((med, index) => (
           <TouchableOpacity
             className='py-2 px-3.5 rounded-xl'
             style={{ backgroundColor: med.color }}
-            onPress={() => handleTakeDose({ logId: med.logId, time: dose.time })}
+            onPress={() => handleTakeDose({ logId: med.logId, time: dose.time, medicineId: med.medicineId })}
           >
             <Text className='text-white font-semibold text-[14px]'>Take</Text>
           </TouchableOpacity>

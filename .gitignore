@@ -1,6 +1,8 @@
 # Dependencies - do not push
 node_modules/
 
+eas.json
+
 # Environment / secrets - never push
 .env
 .env.*

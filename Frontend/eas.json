@@ -9,7 +9,10 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://medremind-ten.vercel.app/api/v1/"
+      }
     },
     "production": {
       "autoIncrement": true
