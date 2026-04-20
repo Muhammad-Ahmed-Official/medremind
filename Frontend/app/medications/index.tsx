@@ -214,10 +214,9 @@ const AddMedication = () => {
         refillReminder: false,
         currentSupply: 0,
         refillAt: 0,
-      });
+      }); 
     } else {
-      // const message = (result && result.payload) || error || "Login failed";
-      Toast.show({ type: 'error', text1: 'Login', text2: result && result.payload });
+      Toast.show({ type: 'error', text1: 'Add Medicine', text2: result && result.payload });
     }
   }
 
@@ -351,7 +350,6 @@ return (
         const hours12 = hours % 12 || 12;
         const newTime = `${String(hours12).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${period}`;
         
-        // Get number of doses from frequency
         const frequencyMap: { [key: string]: number } = {
           "Once daily": 1,
           "Twice daily": 2,

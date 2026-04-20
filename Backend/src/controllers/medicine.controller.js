@@ -4,16 +4,14 @@ import { Medicine } from "../models/medicine.model.js";
 import { MedicineLog } from "../models/medicinelog.model.js";
 
 export const addMedicine = asyncHandler(async (req, res) => {
-  const { name, dosage, frequency, duration, startDate, times, notes, reminderEnabled, refillReminder, currentSupply, refillAt } = req.body;
+  const { userId, name, dosage, frequency, duration, startDate, times, notes, reminderEnabled, refillReminder, currentSupply, refillAt } = req.body;
 
-  if (!name || !dosage || !frequency || !duration || !startDate) {
+  if (!userId || !name || !dosage || !frequency || !duration || !startDate) {
     return res.status(StatusCodes.BAD_REQUEST).send({
       status: StatusCodes.BAD_REQUEST,
       message: "Fields required"
     });
   }
-
-  const userId = "69b1399ed542722a3eafbe8d";
 
   // 1️⃣ Create the medicine
   const medicine = await Medicine.create({
@@ -115,7 +113,8 @@ const timeStringToMinutes = (timeStr) => {
 
 
 export const getTodayMedicines = asyncHandler(async (req, res) => {
-  const userId = "69b1399ed542722a3eafbe8d";
+  const { userId } = req.query;
+  if (!userId) return res.status(StatusCodes.BAD_REQUEST).send({ status: false, message: "userId required" });
 
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -172,7 +171,8 @@ export const getTodayMedicines = asyncHandler(async (req, res) => {
 
 
 export const getHistory = asyncHandler(async (req, res) => {
-  const userId = "69b1399ed542722a3eafbe8d";
+  const { userId } = req.query;
+  if (!userId) return res.status(StatusCodes.BAD_REQUEST).send({ status: false, message: "userId required" });
 
   // 1️⃣ Fetch all medicines of the user
   const medicines = await Medicine.find({ userId }).sort({ startDate: -1 }).lean().select("-frequency -startDate -duration");
@@ -312,8 +312,7 @@ export const markDoseTaken = asyncHandler(async (req, res) => {
 
 
 export const deleteMedicine = asyncHandler(async(req, res) => {
-  const { _id } = req.query; 
-  const userId = "69b1399ed542722a3eafbe8d";
+  const { _id, userId } = req.query;
   if(!_id || !userId) {
     return res.status(StatusCodes.BAD_REQUEST).send({status: StatusCodes.BAD_REQUEST, message: "Fields required"});
   };
@@ -330,7 +329,8 @@ export const deleteMedicine = asyncHandler(async(req, res) => {
 
 
 export const getRefillMedicine = asyncHandler(async (req, res) => {
-  const userId = "69b1399ed542722a3eafbe8d";
+  const { userId } = req.query;
+  if (!userId) return res.status(StatusCodes.BAD_REQUEST).send({ status: false, message: "userId required" });
 
   const meds = await Medicine.find({ userId, refillReminder: true });
 

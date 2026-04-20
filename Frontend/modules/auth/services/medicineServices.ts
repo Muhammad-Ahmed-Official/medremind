@@ -1,6 +1,7 @@
 import api from "@/constants/api";
 
-export const addMedicine = async (data: {   
+export const addMedicine = async (data: {
+    userId: string,
     name: string,
     dosage: string,
     frequency: string,
@@ -22,9 +23,9 @@ export const addMedicine = async (data: {
 };
 
 
-export const getTodaysMedicine = async () => {
+export const getTodaysMedicine = async (userId: string) => {
   try {
-    const response = await api.get("medicine");
+    const response = await api.get("medicine", { params: { userId } });
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Get today's Medicine data failed");
@@ -32,9 +33,9 @@ export const getTodaysMedicine = async () => {
 };
 
 
-export const getHistory = async () => {
+export const getHistory = async (userId: string) => {
   try {
-    const response = await api.get("medicine/history");
+    const response = await api.get("medicine/history", { params: { userId } });
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Get Medicine history data failed");
@@ -42,9 +43,9 @@ export const getHistory = async () => {
 };
 
 
-export const getRefill = async () => {
+export const getRefill = async (userId: string) => {
   try {
-    const response = await api.get("medicine/refillMedicine");
+    const response = await api.get("medicine/refillMedicine", { params: { userId } });
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Get Medicine history data failed");
@@ -63,12 +64,11 @@ export const TodaysMedicineTaken = async (data: { logId: string, time: string })
 };
 
 
-export const deleteMedicine = async (data: { _id: string }) => {
+export const deleteMedicine = async (data: { _id: string, userId: string }) => {
   try {
-    console.log(data)
-    const response = await api.delete("medicine/deleteMedicine", { params: { _id: data} } );
+    const response = await api.delete("medicine/deleteMedicine", { params: data });
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Get today's Medicine taken failed");
+    throw new Error(error.response?.data?.message || "Delete Medicine failed");
   }
 };

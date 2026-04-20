@@ -131,7 +131,7 @@ function CircularProgress({ progress, totalDoses, completedDoses }: CircularProg
         <Text className='text-4xl text-white font-bold'>{totalDoses > 0 ? Math.round((completedDoses / totalDoses) * 100): 0}%</Text>
         <Text className='text-[12px] text-white font-bold'>{completedDoses} of {totalDoses} doeses</Text>
       </View>
-      <Svg width={size} height={size} className='-rotate-90' >
+      <Svg width={size} height={size}>
         <Circle
           cx={size / 2}
           cy={size / 2}
@@ -148,9 +148,7 @@ function CircularProgress({ progress, totalDoses, completedDoses }: CircularProg
           strokeWidth={strokeWidth}
           fill="none"
           strokeDasharray={circumference}
-          strokeDashoffset={
-            circumference - (progress / 100) * circumference
-          }
+          strokeDashoffset={circumference - (progress / 100) * circumference}
           strokeLinecap="round"
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
@@ -240,7 +238,7 @@ const home = () => {
               <SimpleLineIcons name="logout" size={22} color="white" />
             </TouchableOpacity>
           </View>
-          <CircularProgress progress={totalDoses ? completedDoses / totalDoses : 0}  totalDoses={totalDoses || 0} completedDoses={completedDoses || 0} />
+          <CircularProgress progress={totalDoses ? (completedDoses / totalDoses) * 100 : 0}  totalDoses={totalDoses || 0} completedDoses={completedDoses || 0} />
         </View>
       </LinearGradient>
       

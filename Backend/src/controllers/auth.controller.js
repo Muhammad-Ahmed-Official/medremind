@@ -38,7 +38,7 @@ export const login = asyncHandler(async(req, res) => {
         return res.status(StatusCodes.UNAUTHORIZED).send({status: StatusCodes.NOT_FOUND, message: "Incorrect Password"});
     };
 
-    res.status(StatusCodes.OK).send({ status: true, message: "User login successfully" });
+    res.status(StatusCodes.OK).send({ status: true, message: "User login successfully", data: { _id: user._id, userName: user.userName, email: user.email } });
 });
 
 

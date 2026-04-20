@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as medicineServices from "../modules/auth/services/medicineServices";
+import type { RootState } from "./store";
 
 interface MedicineState {
   user: any;
@@ -14,10 +15,17 @@ const initialState: MedicineState = {
 };
 
 
+const getUserId = (thunkAPI: any): string => {
+  const state = thunkAPI.getState() as RootState;
+  return state.auth.user?.data?._id;
+};
+
 export const createMedicineUser = createAsyncThunk("/medicine/createMedicine",
   async (data: { name: string, dosage: string, frequency: string, duration: string, startDate: Date, times: string[], notes: string, reminderEnabled: boolean,refillReminder: boolean, currentSupply?: number, refillAt?: number }, thunkAPI) => {
     try {
-      return await medicineServices.addMedicine(data);
+      const userId = getUserId(thunkAPI);
+      if (!userId) return thunkAPI.rejectWithValue("User not authenticated");
+      return await medicineServices.addMedicine({ ...data, userId });
     } catch (error: any) {
       const message = error?.message
       return thunkAPI.rejectWithValue(message);
@@ -29,7 +37,9 @@ export const createMedicineUser = createAsyncThunk("/medicine/createMedicine",
 export const getTodaysMedicineUser = createAsyncThunk("/medicine/",
   async (_, thunkAPI) => {
     try {
-      return await medicineServices.getTodaysMedicine();
+      const userId = getUserId(thunkAPI);
+      if (!userId) return thunkAPI.rejectWithValue("User not authenticated");
+      return await medicineServices.getTodaysMedicine(userId);
     } catch (error: any) {
       const message = error?.message
       return thunkAPI.rejectWithValue(message);
@@ -41,7 +51,9 @@ export const getTodaysMedicineUser = createAsyncThunk("/medicine/",
 export const getMedicineHistoryUser = createAsyncThunk("/medicine/history",
   async (_, thunkAPI) => {
     try {
-      return await medicineServices.getHistory();
+      const userId = getUserId(thunkAPI);
+      if (!userId) return thunkAPI.rejectWithValue("User not authenticated");
+      return await medicineServices.getHistory(userId);
     } catch (error: any) {
       const message = error?.message
       return thunkAPI.rejectWithValue(message);
@@ -53,7 +65,9 @@ export const getMedicineHistoryUser = createAsyncThunk("/medicine/history",
 export const getRefillMedicineUser = createAsyncThunk("/medicine/refill",
   async (_, thunkAPI) => {
     try {
-      return await medicineServices.getRefill();
+      const userId = getUserId(thunkAPI);
+      if (!userId) return thunkAPI.rejectWithValue("User not authenticated");
+      return await medicineServices.getRefill(userId);
     } catch (error: any) {
       const message = error?.message
       return thunkAPI.rejectWithValue(message);
@@ -77,7 +91,9 @@ export const TodaysMedicineTakenUser = createAsyncThunk("/medicine/taken",
 export const deleteMedicineUser = createAsyncThunk("/medicine/delete",
   async (data: { _id: string }, thunkAPI) => {
     try {
-      return await medicineServices.deleteMedicine(data);
+      const userId = getUserId(thunkAPI);
+      if (!userId) return thunkAPI.rejectWithValue("User not authenticated");
+      return await medicineServices.deleteMedicine({ ...data, userId });
     } catch (error: any) {
       const message = error?.message
       return thunkAPI.rejectWithValue(message);
