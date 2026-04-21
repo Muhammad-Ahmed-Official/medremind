@@ -1,50 +1,226 @@
-# Welcome to your Expo app 👋
+<p align="center">
+  <img src="Frontend/assets/images/icon.png" alt="MidRemind App Icon" width="120" />
+</p>
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+# MidRemind — Medicine Reminder App
 
-## Get started
+<p align="center">
+  <img src="Frontend/assets/images/logo.png" alt="MidRemind Banner" width="480" />
+</p>
 
-1. Install dependencies
+A full-stack mobile application that helps users manage their daily medication schedules, track dose history, and receive push notifications for medication reminders.
 
-   ```bash
-   npm install
-   ```
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20Web-lightgrey)
+![License](https://img.shields.io/badge/license-ISC-green)
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## Table of Contents
 
-In the output, you'll find options to open the app in a
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Environment Variables](#environment-variables)
+- [Getting Started](#getting-started)
+  - [Backend](#backend)
+  - [Frontend](#frontend)
+- [API Reference](#api-reference)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Features
 
-## Get a fresh project
+- **User Authentication** — Sign up, log in, forgot password with email verification code, and password reset
+- **Medication Management** — Add medications with name, dosage, frequency, duration (fixed days or ongoing), start date, and scheduled dose times
+- **Daily Dashboard** — View today's scheduled doses with a circular progress indicator showing completion percentage
+- **Dose Tracking** — Mark individual doses as taken; missed doses are automatically detected based on scheduled times
+- **Dose History** — Browse the full history of all medications and their daily dose logs
+- **Refill Tracker** — Monitor current supply levels; track which medications need refilling based on configurable thresholds
+- **Calendar View** — Visualize medication schedules across dates
+- **Push Notifications** — Daily local notifications scheduled per medication time; automatically cancelled when a dose is marked taken or a medication is deleted
+- **Persistent Auth** — User session persisted via AsyncStorage with Redux state management
+- **Skeleton Loading** — Animated skeleton placeholders while data is being fetched
 
-When you're ready, run:
+---
 
-```bash
-npm run reset-project
+## Tech Stack
+
+### Backend
+| Technology | Purpose |
+|---|---|
+| Node.js + Express 5 | REST API server |
+| MongoDB + Mongoose | Database and ODM |
+| bcryptjs | Password hashing |
+| Nodemailer | Email delivery for password reset codes |
+| dotenv | Environment variable management |
+| nodemon | Development auto-restart |
+
+### Frontend
+| Technology | Purpose |
+|---|---|
+| React Native (Expo SDK 55) | Cross-platform mobile framework |
+| Expo Router | File-based navigation |
+| TypeScript | Type safety |
+| Redux Toolkit | Global state management |
+| Axios | HTTP client |
+| NativeWind + Tailwind CSS | Utility-first styling |
+| expo-notifications | Local push notification scheduling |
+| AsyncStorage | Persistent local storage |
+| expo-linear-gradient | Gradient UI elements |
+| react-native-svg | Circular progress chart |
+| react-native-toast-message | In-app toast notifications |
+
+---
+
+## Project Structure
+
+```
+midremind/
+├── Backend/
+│   ├── src/
+│   │   ├── controllers/
+│   │   │   ├── auth.controller.js       # Signup, login, forgot/reset password
+│   │   │   └── medicine.controller.js   # CRUD, dose tracking, refill logic
+│   │   ├── db/
+│   │   │   └── index.js                 # MongoDB connection
+│   │   ├── email/
+│   │   │   └── template.js              # Email HTML templates
+│   │   ├── models/
+│   │   │   ├── user.model.js            # User schema with bcrypt hooks
+│   │   │   ├── medicine.model.js        # Medication schema
+│   │   │   └── medicinelog.model.js     # Dose log schema (nested doses array)
+│   │   ├── routes/
+│   │   │   ├── auth.routes.js
+│   │   │   └── medicine.routes.js
+│   │   ├── utils/
+│   │   │   ├── asyncHandler.js          # Async error wrapper
+│   │   │   └── sendEmail.js             # Nodemailer helper
+│   │   ├── app.js                       # Express app setup and middleware
+│   │   └── index.js                     # Server entry point
+│   ├── .env
+│   └── package.json
+│
+└── Frontend/
+    ├── app/
+    │   ├── (auth)/                      # Auth screens: sign-in, sign-up, forgot/reset password
+    │   ├── (main)/
+    │   │   └── home.tsx                 # Main dashboard with today's doses
+    │   ├── (profile)/                   # Profile and edit profile screens
+    │   ├── calendar/                    # Calendar view
+    │   ├── history/                     # Dose history log
+    │   ├── medications/                 # Add medication screen
+    │   ├── refills/                     # Refill tracker screen
+    │   ├── welcome.tsx                  # Welcome/onboarding screen
+    │   └── _layout.tsx                  # Root layout
+    ├── components/                      # Shared UI components (Button, Input, Header, etc.)
+    ├── constants/
+    │   ├── api.ts                       # API base URL constant
+    │   └── theme.ts                     # App theme tokens
+    ├── modules/auth/
+    │   ├── components/                  # Auth form components
+    │   ├── hooks/                       # useAuth, useMedicine hooks
+    │   └── services/                    # Axios API call functions
+    ├── services/
+    │   └── notificationService.ts       # Expo push notification scheduling
+    ├── store/
+    │   ├── authSlice.ts                 # Auth Redux slice
+    │   ├── medicineSlice.ts             # Medicine Redux slice
+    │   └── store.ts                     # Redux store configuration
+    ├── theme/
+    │   ├── colors.ts
+    │   └── dimensions.ts
+    ├── app.json                         # Expo configuration
+    └── package.json
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## Prerequisites
 
-To learn more about developing your project with Expo, look at the following resources:
+- **Node.js** >= 18
+- **npm** >= 9
+- **MongoDB** — A running MongoDB instance or Atlas cluster
+- **Expo CLI** — `npm install -g expo-cli`
+- **Android Studio** or **Xcode** for native builds (optional; Expo Go works for development)
+- **Gmail account** (or SMTP credentials) for sending password reset emails
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+## Environment Variables
 
-Join our community of developers creating universal apps.
+### Backend (`Backend/.env`)
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+| Variable | Description |
+|---|---|
+| `MONGO_URI` | MongoDB connection string |
+| `PORTAL_EMAIL` | Gmail address used to send password reset emails |
+| `PORTAL_PASSWORD` | Gmail app password (not the account password) |
+| `ALLOWED_ORIGIN` | Comma-separated allowed CORS origins |
+
+### Frontend (`Frontend/.env`)
+
+| Variable | Description |
+|---|---|
+| `EXPO_PUBLIC_API_URL` | Base URL of the deployed backend API (must end with `/api/v1/`) |
+
+---
+
+## Getting Started
+
+### Backend
+
+```bash
+cd Backend
+npm install
+npm run dev
+```
+
+The server starts with `nodemon` and connects to MongoDB on each request. The default entry point is `src/index.js`.
+
+### Frontend
+
+```bash
+cd Frontend
+npm install
+npx expo start
+```
+
+Then press:
+- `a` — open Android emulator
+- `i` — open iOS simulator
+- `w` — open in browser
+- Scan the QR code with **Expo Go** on a physical device
+
+To build a native Android APK:
+
+```bash
+npx expo run:android
+```
+
+---
+
+## API Reference
+
+All routes are prefixed with `/api/v1`.
+
+### Auth — `/api/v1/auth`
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/signup` | Register a new user |
+| `POST` | `/login` | Log in and receive user data |
+| `POST` | `/forgot-password` | Send a 6-digit OTP to the user's email (valid 30 min) |
+| `POST` | `/change-password` | Reset password using the OTP |
+
+### Medicine — `/api/v1/medicine`
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/createMedicine` | Add a new medication and pre-generate dose logs |
+| `GET` | `/` | Get today's scheduled doses for a user |
+| `GET` | `/history` | Get full dose history for all of a user's medications |
+| `PATCH` | `/markTaken` | Mark a specific dose as taken and decrement supply |
+| `DELETE` | `/deleteMedicine` | Delete a medication and all associated logs |
+| `GET` | `/refillMedicine` | Get medications with refill reminders enabled |
