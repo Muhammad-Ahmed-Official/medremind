@@ -4,13 +4,11 @@ import { User } from "../models/user.model.js";
 import { sendEmailLink } from "../utils/sendEmail.js";
 
 export const signup = asyncHandler(async(req, res) => {
-    // Validate required fields
     const { userName, email, password } = req.body;
     if ([userName, email, password].some((field) => typeof field !== "string" || field.trim() === "")) {
         return res.status(StatusCodes.BAD_REQUEST).send({status: StatusCodes.BAD_REQUEST, message: "Fields required"});
     };
 
-    // Check if the user already exists
     const isUserExist = await User.findOne({ $or: [{ userName }, { email }] });
     if (isUserExist) {
         return res.status(StatusCodes.CONFLICT).send({status: StatusCodes.CONFLICT, message: "User alredy exist"});
@@ -22,7 +20,6 @@ export const signup = asyncHandler(async(req, res) => {
 
 
 export const login = asyncHandler(async(req, res) => {
-    // Validate required fields
     const { email, password } = req.body;
     if ([email, password].some((field) => typeof field !== "string" || field.trim() === "")) {
         return res.status(StatusCodes.BAD_REQUEST).send({status: StatusCodes.BAD_REQUEST, message: "Fields required"});
@@ -43,7 +40,6 @@ export const login = asyncHandler(async(req, res) => {
 
 
 export const forgotPassword = asyncHandler(async(req, res) => {
-    // Validate required fields
     const { email } = req.body;
     if (!email) {
         return res.status(StatusCodes.BAD_REQUEST).send({status: StatusCodes.BAD_REQUEST, message: "Email required"});
@@ -67,7 +63,6 @@ export const forgotPassword = asyncHandler(async(req, res) => {
 
 
 export const changeCurrentPassword = asyncHandler(async(req, res) => {
-    // Validate required fields
     const { email, newPassword, code } = req.body;
     if (!email || !newPassword || !code) {
         return res.status(StatusCodes.BAD_REQUEST).send({status: StatusCodes.BAD_REQUEST, message: "Fields required"});

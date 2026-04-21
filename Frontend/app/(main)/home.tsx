@@ -42,54 +42,6 @@ const QUICK_ACTIONS = [
   },
 ]
 
-const notifications = [
-  {
-    id: 1,
-    title: "Paracetamol",
-    message: "Take after meal",
-    time: "10:00 AM"
-  },
-  {
-    id: 2,
-    title: "Vitamin D",
-    message: "Daily dosage",
-    time: "12:30 PM"
-  },
-  {
-    id: 3,
-    title: "Insulin",
-    message: "Before lunch",
-    time: "1:00 PM"
-  }
-];
-
-const TODAYS_MEDICATIONS = [
-  {
-    id: "1",
-    name: "Aspirin",
-    dosage: "500mg",
-    time: "09:00 AM",
-    taken: true,
-    color: "#E8F5E9",
-  },
-  {
-    id: "2",
-    name: "Vitamin D",
-    dosage: "1000mg",
-    time: "12:00 PM",
-    taken: false,
-    color: "#E3F2FD",
-  },
-  {
-    id: "3",
-    name: "Metformin",
-    dosage: "850mg",
-    time: "08:00 PM",
-    taken: false,
-    color: "#FFF3E0",
-  },
-];
-
 const COLORS = [
   "#2E7D32",
   "#1976D2",
@@ -159,7 +111,6 @@ function CircularProgress({ progress, totalDoses, completedDoses }: CircularProg
 } 
 
 const home = () => {
-  const [showNotifications, setShowNotifications] = useState<boolean>(false);
   const [todayMedicines, setTodayMedicines] = useState<any[]>([]);
   const { getTodaysMedicine, TodaysMedicineTaken,  deleteMedicine, loading, error } = useMedicine();
   const { logout } = useAuth();
@@ -230,14 +181,6 @@ const home = () => {
             <View className='flex-1'>
               <Text className='text-lg opacity-90 font-bold text-white'>Daily Progress</Text>
             </View>
-            <TouchableOpacity onPress={() => setShowNotifications(!showNotifications)} className='relative p-2 bg-[rgba(255,255,255,0.15)] rounded-lg ml-2'>
-              <Ionicons name='notifications-outline' size={24} color='white' />
-              {/* {todayMedicines.length > 0 && ( */}
-                <View className='absolute -top-1 -right-1 bg-[#ff5252] rounded-lg h-5 px-1 justify-center items-center min-w-5'>
-                  <Text className='text-[12px] text-white font-bold'>4</Text>
-                </View>
-              {/* )} */}
-            </TouchableOpacity>
             <TouchableOpacity onPress={() => handleLogout()} className='p-2 bg-[rgba(255,255,255,0.15)] rounded-lg ml-3'>
               <SimpleLineIcons name="logout" size={22} color="white" />
             </TouchableOpacity>
@@ -407,40 +350,6 @@ todayMedicines.map((med, index) => (
 ))
     )}
       </View>
-
-      <Modal
-        visible={showNotifications}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setShowNotifications(false)}
-      >
-      <View className="flex-1 bg-[rgba(0,0,0,0.5)] justify-end">
-        <View className="bg-white rounded-t-[20px] p-5 max-h-[80%]">
-          <View className="flex-row justify-between items-center mb-5">
-            <Text className="text-xl font-semibold text-[#333]">Notifications</Text>
-
-            <TouchableOpacity onPress={() => setShowNotifications(!showNotifications)} className="p-1">
-              <Ionicons name="close" size={24} color="#333" />
-            </TouchableOpacity>
-          </View>
-
-          {notifications.map((medication) => (
-            <View key={medication.id} className="flex-row p-3.5 rounded-xl bg-[#f5f5f5] mb-2.5">
-              <View className="w-10 h-10 rounded-3xl bg-[#E8F5E9] items-center justify-center mr-3.5">
-                <Ionicons name="medical" size={24} color="#2e7d32" />
-              </View>
-
-              <View className="flex-1">
-                <Text className="text-lg font-semibold text-[#333] mb-1">{medication.title}</Text>
-                <Text className="text-[14px] text-[#333] mb-1">{medication.message}</Text>
-                <Text className="text-[12px] text-[#999]">{medication.time}</Text>
-              </View>
-            </View>
-            ))}
-          </View>
-          </View>
-      </Modal>
-
     </ScrollView>
   )
 }
