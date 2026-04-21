@@ -14,6 +14,12 @@ A full-stack mobile application that helps users manage their daily medication s
 ![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20Web-lightgrey)
 ![License](https://img.shields.io/badge/license-ISC-green)
 
+<p align="center">
+  <a href="https://github.com/Muhammad-Ahmed-Official/midremind/releases/latest">
+    <img src="https://img.shields.io/badge/Download%20APK-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Download APK" />
+  </a>
+</p>
+
 ---
 
 ## Table of Contents
@@ -23,6 +29,7 @@ A full-stack mobile application that helps users manage their daily medication s
 - [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
 - [Environment Variables](#environment-variables)
+- [Download](#download)
 - [Getting Started](#getting-started)
   - [Backend](#backend)
   - [Frontend](#frontend)
@@ -198,6 +205,33 @@ To build a native Android APK:
 ```bash
 npx expo run:android
 ```
+
+---
+
+## Download
+
+Pre-built APKs are published as [GitHub Releases](https://github.com/Muhammad-Ahmed-Official/midremind/releases).
+
+### How to upload a new release
+
+1. Build the APK locally or via EAS:
+   ```bash
+   # Local build
+   cd Frontend
+   npx expo run:android --variant release
+
+   # Or via EAS Build (requires EAS CLI and login)
+   eas build --platform android --profile preview
+   ```
+2. Go to [github.com/Muhammad-Ahmed-Official/midremind/releases/new](https://github.com/Muhammad-Ahmed-Official/midremind/releases/new)
+3. Create a new tag (e.g. `v1.0.0`), add release notes, and attach the `.apk` file
+4. Publish — the **Download APK** badge at the top of this README will automatically link to the latest release
+
+### Install on Android
+
+1. Download the `.apk` from the [latest release](https://github.com/Muhammad-Ahmed-Official/midremind/releases/latest)
+2. On your Android device, enable **Install from unknown sources** in Settings → Security
+3. Open the downloaded file to install
 
 ---
 
