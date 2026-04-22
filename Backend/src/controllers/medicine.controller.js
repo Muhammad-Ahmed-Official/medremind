@@ -25,6 +25,7 @@ const isActiveToday = (startDate, duration) => {
   return today >= start && today <= end;
 };
 
+
 const timeStringToMinutes = (timeStr) => {
   const [time, modifier] = timeStr.split(" "); // "10:00", "AM"
   let [hours, minutes] = time.split(":").map(Number);
@@ -197,7 +198,6 @@ export const markDoseTaken = asyncHandler(async (req, res) => {
     return res.status(400).send({ status: false, message: "Fields required" });
   }
 
-  // Today's range
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -278,7 +278,7 @@ export const getRefillMedicine = asyncHandler(async (req, res) => {
   const meds = await Medicine.find({ userId, refillReminder: true });
 
   if (!meds || meds.length === 0) {
-    return res.status(StatusCodes.NOT_FOUND).send({ status: StatusCodes.NOT_FOUND, message: "No refill medicines found" });
+    return res.status(StatusCodes.OK).send({ status: StatusCodes.OK, message: "No refill medicines found" });
   };
 
   const result = meds.map(med => ({
