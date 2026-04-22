@@ -110,6 +110,20 @@ function CircularProgress({ progress, totalDoses, completedDoses }: CircularProg
   )
 } 
 
+const isDoseTimePassed = (timeStr: string): boolean => {
+  const parts = timeStr.split(' ');
+  if (parts.length < 2) return false;
+  const [time, period] = parts;
+  const [hoursStr, minutesStr] = time.split(':');
+  let hours = parseInt(hoursStr, 10);
+  const minutes = parseInt(minutesStr, 10);
+  if (period === 'PM' && hours !== 12) hours += 12;
+  else if (period === 'AM' && hours === 12) hours = 0;
+  const doseTime = new Date();
+  doseTime.setHours(hours, minutes, 0, 0);
+  return new Date() > doseTime;
+};
+
 const home = () => {
   const [todayMedicines, setTodayMedicines] = useState<any[]>([]);
   const { getTodaysMedicine, TodaysMedicineTaken,  deleteMedicine, loading, error } = useMedicine();
@@ -331,6 +345,11 @@ todayMedicines.map((med, index) => (
             <Text className='text-[#4CAF50] font-semibold text-[14px] ml-1'>Taken</Text>
           </View>
         ) : dose.status === "missed" ? (
+          <View className='flex-row items-center bg-[#FFEBEE] px-3 py-1.5 rounded-xl'>
+            <Ionicons name='alert-circle-outline' size={20} color='#E53935' />
+            <Text className='text-[#E53935] font-semibold text-[14px] ml-1'>Missed</Text>
+          </View>
+        ) : isDoseTimePassed(dose.time) ? (
           <View className='flex-row items-center bg-[#FFEBEE] px-3 py-1.5 rounded-xl'>
             <Ionicons name='alert-circle-outline' size={20} color='#E53935' />
             <Text className='text-[#E53935] font-semibold text-[14px] ml-1'>Missed</Text>

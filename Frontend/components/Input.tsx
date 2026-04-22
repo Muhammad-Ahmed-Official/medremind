@@ -10,7 +10,7 @@ const Input = (props:any) => {
         { 
             props.icon && props.icon
         }
-        <TextInput type={props.type || 'text'} value={props.value} className='flex-1 outline-none' placeholderTextColor={theme.colors.textLight} ref={props.inputRef && props.inputRef} {...props} />
+        <TextInput type={props.type || 'text'} value={props.value} className='flex-1 outline-none' placeholderTextColor={theme.colors.textLight} ref={props.inputRef && props.inputRef} {...props} style={[{ color: theme.colors.text }, props.style]} />
         { props.rightIcon && <View className="ml-2">{props.rightIcon}</View> }
     </View>
   )
