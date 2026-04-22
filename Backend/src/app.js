@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import cookieParser from "cookie-parser";
 import { connectDB } from "./db/index.js";
 import authRouter from "./routes/auth.routes.js";
 import medicineRouter from "./routes/medicine.routes.js";

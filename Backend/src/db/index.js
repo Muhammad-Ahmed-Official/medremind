@@ -1,46 +1,23 @@
-import mongoose from "mongoose";
+// med-remind
 
-let cached = globalThis.mongooseCache;
-
-if (!cached) {
-    cached = globalThis.mongooseCache = { conn: null, promise: null };
-}
-
+import mongoose from 'mongoose';
 export const connectDB = async () => {
-    if (mongoose.connection.readyState === 1) {
-        return mongoose.connection;
-    }
-    if (cached.conn) {
-        return cached.conn;
-    }
-    if (!cached.promise) {
-        const mongoUri = process.env.MONGO_URI;
-        if (!mongoUri?.trim()) {
-            throw new Error("MONGO_URI is not set");
-        }
-        const uri = `${mongoUri.replace(/\/$/, "")}/med-remind`;
-        cached.promise = mongoose
-            .connect(uri, {
-                serverSelectionTimeoutMS: 15000,
-                maxPoolSize: 10,
-            })
-            .then(() => mongoose.connection);
-    }
     try {
-        cached.conn = await cached.promise;
-        return cached.conn;
+        const dbConnecttion = await mongoose.connect(`${process.env.MONGO_URI}/med-remind`);
+        console.log(`MongoDB Connected and HOST at: ${dbConnecttion.connection.host}`);
     } catch (error) {
-        cached.promise = null;
-        cached.conn = null;
         console.error("Error connecting to MongoDB:", error.message);
+        // Only attempt to close the connection if it was established
         if (mongoose.connection.readyState !== 0) {
-            await mongoose.connection.close().catch(() => {});
+            await mongoose.connection.close();
+            console.log("MongoDB Connection Closed");
         }
-        throw error;
+        process.exit(1); // Exit the process on failure
     }
 };
 
-process.on("SIGINT", async () => {
+// Gracefully handle application termination
+process.on('SIGINT', async () => {
     console.log("Application is terminating...");
     if (mongoose.connection.readyState !== 0) {
         await mongoose.connection.close();
