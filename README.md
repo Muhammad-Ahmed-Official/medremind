@@ -2,7 +2,7 @@
   <img src="Frontend/assets/images/icon.png" alt="MidRemind App Icon" width="120" />
 </p>
 
-# MidRemind — Medicine Reminder App
+<h1 align="center">MidRemind — Medicine Reminder App</h1>
 
 <p align="center">
   <img src="Frontend/assets/images/logo.png" alt="MidRemind Banner" width="480" />
@@ -10,15 +10,6 @@
 
 A full-stack mobile application that helps users manage their daily medication schedules, track dose history, and receive push notifications for medication reminders.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20Web-lightgrey)
-![License](https://img.shields.io/badge/license-ISC-green)
-
-<p align="center">
-  <a href="https://github.com/Muhammad-Ahmed-Official/midremind/releases/latest">
-    <img src="https://img.shields.io/badge/Download%20APK-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Download APK" />
-  </a>
-</p>
 
 ---
 
