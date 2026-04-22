@@ -180,7 +180,7 @@ const home = () => {
   const handleDeleteMedicine = async(_id: any) => {
     setTodayMedicines(prev =>  prev.filter(med => med?.medicineId !== _id) )
     await cancelAllMedicineNotifications(_id);
-    const result: any = await deleteMedicine(_id);
+    const result: any = await deleteMedicine({ _id });
     if (result?.meta?.requestStatus === "fulfilled") {
     } else {
       Toast.show({ type: 'error', text1: 'Medication', text2: result && result.payload });
